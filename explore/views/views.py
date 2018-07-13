@@ -8,7 +8,7 @@ from idl.coupon_info.ttypes import Response as CouponInfoResponse
 
 # from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TCompactProtocol import TCompactProtocol
-from thrift.protocol.TJsonProtocol import TJsonProtocol
+from thrift.protocol.TJSONProtocol import TJSONProtocol
 from thrift.transport.TTransport import TMemoryBuffer
 
 coupon = {
@@ -53,7 +53,7 @@ class InfoThriftView(View):
             tBinaryProtocol_b = TCompactProtocol(tMemory_b)
             content_type = 'application/octet-stream'
         else:
-            tBinaryProtocol_b = TJsonProtocol(tMemory_b)
+            tBinaryProtocol_b = TJSONProtocol(tMemory_b)
             content_type = 'application/json'
 
         res.write(tBinaryProtocol_b)
