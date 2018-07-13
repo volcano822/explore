@@ -1,14 +1,16 @@
 # -*- coding:utf-8 -*-
 
+from idl.coupon_info.ttypes import CouponInfo
+from idl.coupon_info.ttypes import Response as CouponInfoResponse
+
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.views.generic import View
-from idl.coupon_info.ttypes import CouponInfo
-from idl.coupon_info.ttypes import Response as CouponInfoResponse
 
 # from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TCompactProtocol import TCompactProtocol
 from thrift.protocol.TJSONProtocol import TJSONProtocol
+from thrift.protocol.TJSONProtocol import TSimpleJSONProtocol
 from thrift.transport.TTransport import TMemoryBuffer
 
 coupon = {
@@ -52,8 +54,11 @@ class InfoThriftView(View):
         if out_format == 'binary':
             tBinaryProtocol_b = TCompactProtocol(tMemory_b)
             content_type = 'application/octet-stream'
-        else:
+        elif out_format == 'tjson':
             tBinaryProtocol_b = TJSONProtocol(tMemory_b)
+            content_type = 'application/json'
+        else:
+            tBinaryProtocol_b = TSimpleJSONProtocol(tMemory_b)
             content_type = 'application/json'
 
         res.write(tBinaryProtocol_b)
