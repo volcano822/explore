@@ -1,12 +1,14 @@
 # -*- coding:utf-8 -*-
 
-from idl.coupon_info.ttypes import CouponInfo
-from idl.coupon_info.ttypes import Response as CouponInfoResponse
-
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.views.generic import View
-from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from idl.coupon_info.ttypes import CouponInfo
+from idl.coupon_info.ttypes import Response as CouponInfoResponse
+
+# from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from thrift.protocol.TCompactProtocol import TCompactProtocol
+from thrift.protocol.TJsonProtocol import TJsonProtocol
 from thrift.transport.TTransport import TMemoryBuffer
 
 coupon = {
@@ -29,6 +31,8 @@ class InfoThriftView(View):
     """获取优惠券信息"""
 
     def post(self, request):
+        out_format = request.POST.get('OutFormat', 'json')
+
         info = CouponInfo(
                 cid=coupon['cid'],
                 name=coupon['name'],
@@ -44,14 +48,18 @@ class InfoThriftView(View):
                 des=coupon['desc'],
         )
         res = CouponInfoResponse(code=0, message='success', info=info)
-        print res
         tMemory_b = TMemoryBuffer()
-        tBinaryProtocol_b = TBinaryProtocol(tMemory_b)
+        if out_format == 'binary':
+            tBinaryProtocol_b = TCompactProtocol(tMemory_b)
+            content_type = 'application/octet-stream'
+        else:
+            tBinaryProtocol_b = TJsonProtocol(tMemory_b)
+            content_type = 'application/json'
 
         res.write(tBinaryProtocol_b)
 
         memory_buffer = tMemory_b.getvalue()
-        return HttpResponse(content=memory_buffer, content_type='application/octet-stream')
+        return HttpResponse(content=memory_buffer, content_type=content_type)
 
 
 class InfoJsonView(View):
