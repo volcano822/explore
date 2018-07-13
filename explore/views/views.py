@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 
+from idl.coupon_info.ttypes import CouponInfo
+from idl.coupon_info.ttypes import Response as CouponInfoResponse
+
 from django.http import JsonResponse
 from django.http.response import HttpResponse
 from django.views.generic import View
-from idl.coupon_info.ttypes import CouponInfo
-from idl.coupon_info.ttypes import Response as CouponInfoResponse
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.transport.TTransport import TMemoryBuffer
 
@@ -55,6 +56,10 @@ class InfoThriftView(View):
 
 class InfoJsonView(View):
     def post(self, request):
-        result = coupon
+        result = {
+            'coupon': coupon,
+            'code': 0,
+            'message': 'success',
+        }
 
         return JsonResponse({'coupon': result})
